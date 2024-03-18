@@ -1,0 +1,32 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.define "serveur" do |serveur|
+    serveur.vm.box = "debian/buster64"
+    serveur.vm.hostname = "serveur"
+    
+    # Configuration réseau
+    serveur.vm.network "monreseau", ip: "192.168.10.1"
+    
+    # Configuration des provisions
+    serveur.vm.provision "shell", inline: <<-SHELL
+      # Installation de nginx
+      apt-get update
+      apt-get install -y nginx
+
+      # Configuration de nginx pour servir une simple page statique
+      echo "Welcome to the static page served by nginx" > /var/www/html/index.html
+
+      # Installation du firewall (par exemple ufw)
+      apt-get install -y ufw
+
+      # Configuration du firewall pour autoriser le trafic HTTP
+      ufw allow 80/tcp
+
+      # Activation du firewall
+      ufw --force enable
+    SHELL
+  end
+end
+
